@@ -1,15 +1,10 @@
 <template>
   <div id="wrapper" >
-    <div v-if="connectedToDeamon === true">
+    <div v-if="true || connectedToDeamon === true" style="height:100%">
       <side-menu></side-menu>
-      <wallet-menu></wallet-menu>
-      <div class="inner-content">
-        <router-view></router-view>
-      </div>
+      <router-view></router-view>
     </div>
     <div v-else>
-      <side-menu v-bind:is-enabled="connectedToDeamon"></side-menu>
-      <wallet-menu v-bind:is-enabled="connectedToDeamon"></wallet-menu>
       <div class="inner-content">
         <div id="connecting">{{ connStatus }}</div>
       </div>
@@ -18,21 +13,19 @@
 </template>
 
 <script>
-  import WalletMenu from './Wallet/WalletMenu'
+  import { mapState } from 'vuex'
   import SideMenu from './shared/Menu'
-  import Addresses from './Wallet/Addresses'
-   import { mapState } from 'vuex'
-
+  
   const Repeat = require('repeat')
   var request = require('request')
   var store = require('store')
   var cmd = require('node-cmd')
   const bitcoin = require('bitcoin')
   var hush = require('hush')
- 
+
   export default {
-    name: 'wallet',
-    components: { WalletMenu, SideMenu, Addresses },
+    name: 'main-page',
+    components: {SideMenu },
    
     computed: { 
       ...mapState([
@@ -72,7 +65,7 @@
 
           }
         )
-
+ 
         var rpcuser = 'rpcuser'
         var rpcpassword = 'rpcpassword'
         var rpcport = 8822
@@ -90,8 +83,11 @@
         Repeat(function() {
 
           if (self.connectedToDeamon) {
+            self.$store.dispatch('refreshAddresses');
+            self.$store.dispatch('refreshNetworkStats');                
             self.$store.dispatch('refreshBalances');    
             self.$store.dispatch('refreshTransactions'); 
+            self.$store.dispatch('refreshOperations'); 
           }
           else {
             var client = new bitcoin.Client({
@@ -131,7 +127,7 @@
 </script>
 
 <style>
-  @import url('https://fonts.googleapis.com/css?family=Poppins:300,400,500,700');
+ @import url('https://fonts.googleapis.com/css?family=Poppins:300,400,500,700');
 
   * {
     font-family: 'Poppins', sans-serif;
@@ -258,20 +254,6 @@
     -webkit-app-region: no-drag;
   }
 
-  .doc .button:hover {
-    background-color: #2262d6;
-  }
-
-  .doc .button-alt {
-    color: #3e3e3e;
-    margin-right: 5px;
-    background-color: transparent;
-  }
-
-  .doc .button-alt:hover {
-    background-color: #e2e2e2;
-  }
-
   .inner-content {
     position: absolute;
     width: 100%;
@@ -313,17 +295,24 @@
 
   .bottom-row .box #texts {
     float: left;
-    list-style-type: none;
+    display: list-item;
+    list-style-type:none;
+    font-weight: 500;
+    color: #fff;
+  }
+
+  .bottom-row .box #texts li{   
+    color: #fff;
   }
 
   .bottom-row .box #balances {
     float: right;
     text-align: right;
     list-style-type: none;
+    color: #fff;
+    display: list-item;
   }
-
-  .bottom-row .box li {
-    font-weight: 500;
+  .bottom-row .box #balances li {   
     color: #fff;
   }
 
@@ -388,6 +377,11 @@
       background-color:#eaeaea;
       border: none;
   }
+
+  .el-select-dropdown__item.is-disabled {
+    color: #c0c4cc;
+    cursor: not-allowed;
+}
 
   .button {
     font-size: 11pt;

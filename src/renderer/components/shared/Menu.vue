@@ -1,16 +1,15 @@
 <template>
   <div id="side-menu">
     <img id="logo" src="~@/assets/hush-icon-white.png" alt="HushNG Logo" />
-    <div v-if="isEnabled === true">
-      <ul class="icons menu-sections">
-        <router-link v-for="(item, index) in menuSections" v-bind:class="{ active: item.active }" v-bind:key="item.name" class="icon" tag="li" :to="item.route" v-on:click.native="x(index);" ><img :src="item.path" style="font-color: #fff;" /></router-link>
-      </ul>
-    </div>
+        <ul class="icons menu-sections">
+          <li v-for="(item, index) in menuSections" v-bind:class="{ active: index == activeItemIndex }" class="icon" v-on:click="switchTo(index);" >
+            <img :src="item.path" style="font-color: #fff;" />
+          </li>
+        </ul>
   </div>
 </template>
 
 <script>
-
   export default {
     name: 'side-menu',
     components: {  },
@@ -20,31 +19,24 @@
         default: true
       }
     },
-    data () {
+    data () {      
       return {
         menuSections: [
-          { 'name': 'wallet', 'route': '/wallet/addresses', 'path' : '/static/icons/wallet.svg', 'active': true },
-          { 'name': 'contacts', 'route': '/Contacts/contacts', 'path' : '/static/icons/addressbook.svg','active': false },
-          { 'name': 'transactions', 'route': '/wallet/transactions', 'path' : '/static/icons/comment.svg','active': false },
-        ]
+          { 'name': 'wallet', 'route': '/wallet/Addresses', 'path' : '/static/icons/wallet.svg', 'active': true },
+          { 'name': 'contacts', 'route': '/contacts/Addresses', 'path' : '/static/icons/addressbook.svg','active': false },
+          { 'name': 'messenger', 'route': '/messenger', 'path' : '/static/icons/comment.svg','active': false },
+        ],
+        activeItemIndex : 0
       }
-    },
+    },   
     methods: { 
-      x(item) {
-        
-        var self = this;
-        var item  = item;
-        for (var i = 0; i < self.menuSections.length; i++) {
-          if (i == item) {
-            self.menuSections[i].active = true
-          } else {
-            self.menuSections[i].active = false
-          }
-        }
+      switchTo(item) {
+        this.activeItemIndex = item;
+        this.$router.push({path: this.menuSections[item].route});
       }
     },
     mounted: function() {
-    
+     console.log("mounted menu");
     }
   }
 </script>
